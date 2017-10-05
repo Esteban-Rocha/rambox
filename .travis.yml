@@ -1,11 +1,11 @@
 sudo: required
 language: node_js
 node_js:
-  - "4"
+  - "8"
 
 branches:
   only:
-    - /\d+\.\d+\.\d+/
+    - master
 
 os:
   - linux

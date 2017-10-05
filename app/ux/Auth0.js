@@ -4,9 +4,13 @@ Ext.define('Rambox.ux.Auth0', {
 	// private
 	,lock: null
 	,auth0: null
+	,backupCurrent: false
 
 	,init: function() {
 		var me = this;
+
+		var Auth0Lock = require('auth0-lock')['default'];
+		var Auth0 = require('auth0-js');
 
 		// Auth0 Config
 		me.lock = new Auth0Lock(auth0Cfg.clientID, auth0Cfg.domain, {
@@ -29,7 +33,7 @@ Ext.define('Rambox.ux.Auth0', {
 			,language: localStorage.getItem('locale-auth0') === null ? 'en' : localStorage.getItem('locale-auth0')
 		});
 
-		me.auth0 = new Auth0({ clientID: auth0Cfg.clientID, domain : auth0Cfg.domain });
+		me.auth0 = new Auth0.WebAuth({ clientID: auth0Cfg.clientID, domain : auth0Cfg.domain });
 
 		me.defineEvents();
 	}
@@ -39,10 +43,15 @@ Ext.define('Rambox.ux.Auth0', {
 
 		me.lock.on("authenticated", function(authResult) {
 			me.lock.getProfile(authResult.idToken, function(err, profile) {
-				if (err) {
-					// Handle error
+				if ( err ) {
+					if ( err.error === 401 || err.error === 'Unauthorized' ) return me.renewToken(me.checkConfiguration);
 					Ext.Msg.hide();
-					return;
+					return Ext.Msg.show({
+						 title: 'Error'
+						,message: 'There was an error getting the profile: ' + err.error_description
+						,icon: Ext.Msg.ERROR
+						,buttons: Ext.Msg.OK
+					});
 				}
 
 				// Display a spinner while waiting
@@ -51,13 +60,16 @@ Ext.define('Rambox.ux.Auth0', {
 				// Google Analytics Event
 				ga_storage._trackEvent('Users', 'loggedIn');
 
+				// Set cookies to help Tooltip.io messages segmentation
+				Ext.util.Cookies.set('auth0', true);
+
 				// User is logged in
 				// Save the profile and JWT.
 				localStorage.setItem('profile', JSON.stringify(profile));
 				localStorage.setItem('id_token', authResult.idToken);
 				localStorage.setItem('refresh_token', authResult.refreshToken);
 
-				if ( !Ext.isEmpty(profile.user_metadata) && !Ext.isEmpty(profile.user_metadata.services) ) {
+				if ( !Ext.isEmpty(profile.user_metadata) && !Ext.isEmpty(profile.user_metadata.services) && !me.backupCurrent ) {
 					Ext.each(profile.user_metadata.services, function(s) {
 						var service = Ext.create('Rambox.model.Service', s);
 						service.save();
@@ -74,7 +86,7 @@ Ext.define('Rambox.ux.Auth0', {
 		});
 	}
 
-	,backupConfiguration: function() {
+	,backupConfiguration: function(callback) {
 		var me = this;
 
 		Ext.Msg.wait('Saving backup...', 'Please wait...');
@@ -110,6 +122,8 @@ Ext.define('Rambox.ux.Auth0', {
 					,align: 't'
 					,closable: false
 				});
+
+				if ( Ext.isFunction(callback) ) callback.bind(me)();
 			}
 			,failure: function(response) {
 				if ( response.status === 401 ) return me.renewToken(me.backupConfiguration);
@@ -122,6 +136,9 @@ Ext.define('Rambox.ux.Auth0', {
 					,align: 't'
 					,closable: false
 				});
+
+				if ( Ext.isFunction(callback) ) callback.bind(me)();
+
 				console.error(response);
 			}
 		});
@@ -132,8 +149,13 @@ Ext.define('Rambox.ux.Auth0', {
 
 		me.lock.getProfile(localStorage.getItem('id_token'), function (err, profile) {
 			if ( err ) {
-				if ( err.error === 401 ) return me.renewToken(me.restoreConfiguration);
-				return alert('There was an error getting the profile: ' + err.message);
+				if ( err.error === 401 || err.error === 'Unauthorized' ) return me.renewToken(me.checkConfiguration);
+				return Ext.Msg.show({
+					 title: 'Error'
+					,message: 'There was an error getting the profile: ' + err.error_description
+					,icon: Ext.Msg.ERROR
+					,buttons: Ext.Msg.OK
+				});
 			}
 
 			// First we remove all current services
@@ -154,8 +176,13 @@ Ext.define('Rambox.ux.Auth0', {
 
 		me.lock.getProfile(localStorage.getItem('id_token'), function (err, profile) {
 			if ( err ) {
-				if ( err.error === 401 ) return me.renewToken(me.checkConfiguration);
-				return alert('There was an error getting the profile: ' + err.message);
+				if ( err.error === 401 || err.error === 'Unauthorized' ) return me.renewToken(me.checkConfiguration);
+				return Ext.Msg.show({
+					 title: 'Error'
+					,message: 'There was an error getting the profile: ' + err.error_description
+					,icon: Ext.Msg.ERROR
+					,buttons: Ext.Msg.OK
+				});
 			}
 
 			if ( !profile.user_metadata ) {
@@ -225,5 +252,8 @@ Ext.define('Rambox.ux.Auth0', {
 		localStorage.removeItem('profile');
 		localStorage.removeItem('id_token');
 		localStorage.removeItem('refresh_token');
+
+		// Set cookies to help Tooltip.io messages segmentation
+		Ext.util.Cookies.set('auth0', false);
 	}
 });

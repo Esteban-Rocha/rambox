@@ -31,12 +31,33 @@
 
 ----------
 
+## Table of Contents
+
+- [Screenshot](#screenshot)
+- [Services available - 89](#services-available---95)
+- [Features](#features)
+- [Privacy](#privacy)
+- [Donations](#donations)
+- [Translations](#translations)
+- [Install on Linux - Steps](#install-on-linux---steps)
+- [To Do](#to-do)
+- [Getting Involved](#getting-involved)
+- [Getting Started](#getting-started)
+    - [Technologies](#technologies)
+    - [Environment](#environment)
+    - [Quickstart](#quickstart)
+    - [Compile on Ubuntu](#compile-on-ubuntu)
+- [Disclosure](#disclosure)
+- [Licence](#licence)
+
+----------
+
 ## Screenshot
 
 ![Rambox](https://raw.githubusercontent.com/saenzramiro/rambox/master/resources/screenshots/mac.png)
 
 
-## Services available - 84
+## Services available - 95
 
 <img width="80" align="left" src="https://raw.githubusercontent.com/saenzramiro/rambox/master/resources/icons/whatsapp.png" alt="WhatsApp" title="WhatsApp">
 <img width="80" align="left" src="https://raw.githubusercontent.com/saenzramiro/rambox/master/resources/icons/messenger.png" alt="Messenger" title="Messenger">
@@ -48,6 +69,7 @@
 <img width="80" align="left" src="https://raw.githubusercontent.com/saenzramiro/rambox/master/resources/icons/gmail.png" alt="Gmail" title="Gmail">
 <img width="80" align="left" src="https://raw.githubusercontent.com/saenzramiro/rambox/master/resources/icons/inbox.png" alt="Inbox" title="Inbox">
 <img width="80" align="left" src="https://raw.githubusercontent.com/saenzramiro/rambox/master/resources/icons/hipchat.png" alt="HipChat" title="HipChat">
+<img width="80" align="left" src="https://raw.githubusercontent.com/saenzramiro/rambox/master/resources/icons/allo.png" alt="Allo" title="Allo">
 
 <img width="80" align="left" src="https://raw.githubusercontent.com/saenzramiro/rambox/master/resources/icons/chatwork.png" alt="ChatWork" title="ChatWork">
 <img width="80" align="left" src="https://raw.githubusercontent.com/saenzramiro/rambox/master/resources/icons/groupme.png" alt="GroupMe" title="GroupMe">
@@ -106,11 +128,9 @@
 
 <img width="80" align="left" src="https://raw.githubusercontent.com/saenzramiro/rambox/master/resources/icons/typetalk.png" alt="Typetalk" title="Typetalk">
 <img width="80" align="left" src="https://raw.githubusercontent.com/saenzramiro/rambox/master/resources/icons/drift.png" alt="Drift" title="Drift">
-<img width="80" align="left" src="https://raw.githubusercontent.com/saenzramiro/rambox/master/resources/icons/mmmelon.png" alt="mmmelon" title="mmmelon">
 <img width="80" align="left" src="https://raw.githubusercontent.com/saenzramiro/rambox/master/resources/icons/spark.png" alt="Cisco Spark" title="Cisco Spark">
 <img width="80" align="left" src="https://raw.githubusercontent.com/saenzramiro/rambox/master/resources/icons/fleep.png" alt="Fleep" title="Fleep">
 <img width="80" align="left" src="https://raw.githubusercontent.com/saenzramiro/rambox/master/resources/icons/socialcast.png" alt="Socialcast" title="Socialcast">
-<img width="80" align="left" src="https://raw.githubusercontent.com/saenzramiro/rambox/master/resources/icons/actor.png" alt="Actor" title="Actor">
 <img width="80" align="left" src="https://raw.githubusercontent.com/saenzramiro/rambox/master/resources/icons/riot.png" alt="Riot" title="Riot">
 <img width="80" align="left" src="https://raw.githubusercontent.com/saenzramiro/rambox/master/resources/icons/pushbullet.png" alt="Pushbullet" title="Pushbullet">
 <img width="80" align="left" src="https://raw.githubusercontent.com/saenzramiro/rambox/master/resources/icons/movim.png" alt="Movim" title="Movim">
@@ -127,11 +147,23 @@
 <img width="80" align="left" src="https://raw.githubusercontent.com/saenzramiro/rambox/master/resources/icons/hibox.png" alt="Hibox" title="Hibox">
 <img width="80" align="left" src="https://raw.githubusercontent.com/saenzramiro/rambox/master/resources/icons/jandi.png" alt="Jandi" title="Jandi">
 <img width="80" align="left" src="https://raw.githubusercontent.com/saenzramiro/rambox/master/resources/icons/threema.png" alt="Threema" title="Threema">
+<img width="80" align="left" src="https://raw.githubusercontent.com/saenzramiro/rambox/master/resources/icons/messengerpages.png" alt="Messenger for Pages" title="Messenger for Pages">
+<img width="80" align="left" src="https://raw.githubusercontent.com/saenzramiro/rambox/master/resources/icons/vk.png" alt="VK Messenger" title="VK Messenger">
+<img width="80" align="left" src="https://raw.githubusercontent.com/saenzramiro/rambox/master/resources/icons/mastodon.png" alt="Mastodon" title="Mastodon">
+<img width="80" align="left" src="https://raw.githubusercontent.com/saenzramiro/rambox/master/resources/icons/teamworkchat.png" alt="Teamwork Chat" title="Teamwork Chat">
+<img width="80" align="left" src="https://raw.githubusercontent.com/saenzramiro/rambox/master/resources/icons/clocktweets.png" alt="ClockTweets" title="ClockTweets">
+<img width="80" align="left" src="https://raw.githubusercontent.com/saenzramiro/rambox/master/resources/icons/intercom.png" alt="Intercom" title="Intercom">
+<img width="80" align="left" src="https://raw.githubusercontent.com/saenzramiro/rambox/master/resources/icons/googlevoice.png" alt="Voice" title="Voice">
+<img width="80" align="left" src="https://raw.githubusercontent.com/saenzramiro/rambox/master/resources/icons/sandstorm.png" alt="Sandstorm" title="Sandstorm">
+<img width="80" align="left" src="https://raw.githubusercontent.com/saenzramiro/rambox/master/resources/icons/gadugadu.png" alt="Gadu-Gadu" title="Gadu-Gadu">
+<img width="80" align="left" src="https://raw.githubusercontent.com/saenzramiro/rambox/master/resources/icons/mailru.png" alt="Mail.Ru" title="Mail.Ru">
+<img width="80" align="left" src="https://raw.githubusercontent.com/saenzramiro/rambox/master/resources/icons/kune.png" alt="Kune" title="Kune">
 
-<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 
 ## Features
 
+- [x] Multi-language.
 - [x] Sync your configuration between multiple computers.
 - [x] Master Password.
 - [x] Lock Rambox if you will be away for a period of time.
@@ -141,7 +173,7 @@
 - [x] Minimize to tray.
 - [x] Mute audio to specific service.
 - [x] Separate tabs floating to the right.
-- [x] Go Offline on specific service.
+- [x] Disable a service instead of remove it.
 - [x] Start automatically on system startup.
 - [x] Custom Code Injection.
 - [x] Keyboard Shortcuts.
@@ -154,6 +186,15 @@ No personal information will be saved
 Sessions will persist using the [partition:persist](http://electron.atom.io/docs/api/web-view-tag/#partition) attribute for Webviews. So every time you open Rambox, your sessions will keep alive until you remove the service.
 
 Sync feature use Auth0 for Single Sign On & Token Based Authentication and to store the services that user is using (and the configuration for each service). You are always welcome to check the code! ;)
+
+## Donations
+
+| Type     |                                         URL/Wallet                                         |
+|----------|:------------------------------------------------------------------------------------------:|
+| PayPal   | [HERE](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=WU75QWS7LH2CA) |
+| Bitcoin  | 1Jpa6aSqLjeAiwEzDEBiYcR7dcy5YGYdmB                                                         |
+| Ethereum | 0xFa20A0CEc2888fcB1aA8d15D85Af2B7E472b874F                                                 |
+| Litecoin | Lc5L7mkH5L5U3TR7i8mAQpCu6jUm6J1F4C                                                         |
 
 ## Translations
 

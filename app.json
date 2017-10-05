@@ -40,6 +40,7 @@
      *      ]
      */
     "requires": [
+		"ext-locale"
     ],
 
     /**
@@ -101,14 +102,6 @@
     "js": [
 		{
             "path": "${framework.dir}/build/ext-all-rtl.js"
-        },
-        {
-            "path": "resources/js/auth0-7.1.0.min.js",
-			"remote": true
-        },
-		{
-            "path": "resources/js/lock-10.2.2/lock.min.js",
-			"remote": true
         },
         {
             "path": "resources/js/GALocalStorage.js"

@@ -7,6 +7,7 @@ Ext.define('Rambox.Application', {
 		 'Rambox.ux.Auth0'
 		,'Rambox.util.MD5'
 		,'Ext.window.Toast'
+		,'Ext.util.Cookies'
 	]
 
 	,stores: [
@@ -30,11 +31,18 @@ Ext.define('Rambox.Application', {
 		ga_storage._trackPageview('/index.html', 'main');
 		ga_storage._trackEvent('Versions', require('electron').remote.app.getVersion());
 
+		// Load language for Ext JS library
+		Ext.Loader.loadScript({url: Ext.util.Format.format("ext/packages/ext-locale/build/ext-locale-{0}.js", localStorage.getItem('locale-auth0') || 'en')});
+
 		// Initialize Auth0
-		Rambox.ux.Auth0.init();
+		if ( auth0Cfg.clientID !== '' && auth0Cfg.domain !== '' ) Rambox.ux.Auth0.init();
+
+		// Set cookies to help Tooltip.io messages segmentation
+		Ext.util.Cookies.set('version', require('electron').remote.app.getVersion());
+		if ( Ext.util.Cookies.get('auth0') === null ) Ext.util.Cookies.set('auth0', false);
 
 		// Check for updates
-		if ( require('electron').remote.process.argv.indexOf('--without-update') === -1 && process.platform !== 'win32' ) Rambox.app.checkUpdate(true);
+		if ( require('electron').remote.process.argv.indexOf('--without-update') === -1 ) Rambox.app.checkUpdate(true);
 
 		// Add shortcuts to switch services using CTRL + Number
 		var map = new Ext.util.KeyMap({
@@ -190,6 +198,7 @@ Ext.define('Rambox.Application', {
 
 		// Define default value
 		if ( localStorage.getItem('dontDisturb') === null ) localStorage.setItem('dontDisturb', false);
+		ipc.send('setDontDisturb', localStorage.getItem('dontDisturb')); // We store it in config
 
 		if ( localStorage.getItem('locked') ) {
 			console.info('Lock Rambox:', 'Enabled');
@@ -203,9 +212,17 @@ Ext.define('Rambox.Application', {
 	,updateTotalNotifications: function( newValue, oldValue ) {
 		newValue = parseInt(newValue);
 		if ( newValue > 0 )	{
-			document.title = 'Rambox (' + Rambox.util.Format.formatNumber(newValue) + ')';
+			if ( Ext.cq1('app-main').getActiveTab().record ) {
+				document.title = 'Rambox (' + Rambox.util.Format.formatNumber(newValue) + ') - '+Ext.cq1('app-main').getActiveTab().record.get('name');
+			} else {
+				document.title = 'Rambox (' + Rambox.util.Format.formatNumber(newValue) + ')';
+			}
 		} else {
-			document.title = 'Rambox';
+			if ( Ext.cq1('app-main') && Ext.cq1('app-main').getActiveTab().record ) {
+				document.title = 'Rambox - '+Ext.cq1('app-main').getActiveTab().record.get('name');
+			} else {
+				document.title = 'Rambox';
+			}
 		}
 	}
 

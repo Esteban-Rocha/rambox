@@ -34,13 +34,31 @@ exports.create = function(win, config) {
 	appIcon = new Tray(iconPath);
 	appIcon.setToolTip('Rambox');
 	appIcon.setContextMenu(contextMenu);
-	appIcon.on('double-click', function() {
-		win.webContents.executeJavaScript('ipc.send("toggleWin", true);');
-	});
+
+	switch (process.platform) {
+		case 'darwin':
+			break;
+		case 'linux':
+		case 'freebsd':
+		case 'sunos':
+			// Double click is not supported and Click its only supported when app indicator is not used.
+			// Read more here (Platform limitations): https://github.com/electron/electron/blob/master/docs/api/tray.md
+			appIcon.on('click', function() {
+				win.webContents.executeJavaScript('ipc.send("toggleWin", true);');
+			});
+			break;
+		case 'win32':
+			appIcon.on('double-click', function() {
+				win.webContents.executeJavaScript('ipc.send("toggleWin", true);');
+			});
+			break;
+		default:
+			break;
+	}
 };
 
 exports.destroy = function() {
-	appIcon.destroy();
+	if (appIcon) appIcon.destroy();
 	appIcon = null;
 };
 

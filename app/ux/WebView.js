@@ -9,6 +9,7 @@ Ext.define('Rambox.ux.WebView',{
 		 'Rambox.util.Format'
 		,'Rambox.util.Notifier'
 		,'Rambox.util.UnreadCounter'
+		,'Rambox.util.IconLoader'
 	]
 
 	// private
@@ -173,7 +174,7 @@ Ext.define('Rambox.ux.WebView',{
 					,plugins: 'true'
 					,allowtransparency: 'on'
 					,autosize: 'on'
-					//,webpreferences: 'nodeIntegration=no'
+					,webpreferences: 'allowRunningInsecureContent=yes' //,nativeWindowOpen=yes
 					//,disablewebsecurity: 'on' // Disabled because some services (Like Google Drive) dont work with this enabled
 					,useragent: Ext.getStore('ServicesList').getById(me.record.get('type')).get('userAgent')
 					,preload: './resources/js/rambox-service-api.js'
@@ -251,6 +252,9 @@ Ext.define('Rambox.ux.WebView',{
 
 			// Apply saved zoom level
 			webview.setZoomLevel(me.record.get('zoomLevel'));
+
+			// Set special icon for some service (like Slack)
+			Rambox.util.IconLoader.loadServiceIconUrl(me, webview);
 		});
 
 		// Open links in default browser
@@ -272,7 +276,7 @@ Ext.define('Rambox.ux.WebView',{
 					if ( e.url.indexOf('plus.google.com/u/0/photos/albums') >= 0 ) {
 						ipc.send('image:popup', e.url, e.target.partition);
 						return;
-					} else if ( e.url.indexOf('https://hangouts.google.com/hangouts/_/CONVERSATION/') >= 0 ) {
+					} else if ( e.url.indexOf('/el/CONVERSATION/') >= 0 ) {
 						me.add({
 							 xtype: 'window'
 							,title: 'Video Call'
@@ -291,7 +295,7 @@ Ext.define('Rambox.ux.WebView',{
 									 tag: 'webview'
 									,src: e.url
 									,style: 'width:100%;height:100%;'
-									,partition: 'persist:' + me.record.get('type') + '_' + me.id.replace('tab_', '') + (localStorage.getItem('id_token') ? '_' + Ext.decode(localStorage.getItem('profile')).user_id : '')
+									,partition: me.getWebView().partition
 									,useragent: Ext.getStore('ServicesList').getById(me.record.get('type')).get('userAgent')
 								}
 							}
@@ -319,7 +323,7 @@ Ext.define('Rambox.ux.WebView',{
 									 tag: 'webview'
 									,src: e.url
 									,style: 'width:100%;height:100%;'
-									,partition: e.options.webPreferences.partition
+									,partition: me.getWebView().partition
 									,useragent: Ext.getStore('ServicesList').getById(me.record.get('type')).get('userAgent')
 								}
 							}
@@ -327,6 +331,59 @@ Ext.define('Rambox.ux.WebView',{
 						e.preventDefault();
 						return;
 					}
+					break;
+				case 'icloud':
+					if ( e.url.indexOf('index.html#compose') >= 0 ) {
+						me.add({
+							 xtype: 'window'
+							,title: 'iCloud - Compose'
+							,width: 700
+							,height: 500
+							,maximizable: true
+							,resizable: true
+							,draggable: true
+							,collapsible: true
+							,items: {
+								 xtype: 'component'
+								,itemId: 'webview'
+								,hideMode: 'offsets'
+								,autoRender: true
+								,autoShow: true
+								,autoEl: {
+									 tag: 'webview'
+									,src: e.url
+									,style: 'width:100%;height:100%;'
+									,partition: me.getWebView().partition
+									,useragent: Ext.getStore('ServicesList').getById(me.record.get('type')).get('userAgent')
+									,preload: './resources/js/rambox-modal-api.js'
+								}
+							}
+							,listeners: {
+								show: function(win) {
+									const webview = win.down('#webview').el.dom;
+									webview.addEventListener('ipc-message', function(event) {
+										var channel = event.channel;
+										switch (channel) {
+											case 'close':
+												win.close();
+												break;
+											default:
+												break;
+										}
+									});
+								}
+							}
+						}).show();
+						e.preventDefault();
+						return;
+					}
+					break;
+				case 'flowdock':
+					if ( e.disposition === 'new-window' ) {
+						e.preventDefault();
+						require('electron').shell.openExternal(e.url);
+					}
+					return;
 					break;
 				default:
 					break;
@@ -347,6 +404,7 @@ Ext.define('Rambox.ux.WebView',{
 			// Mute Webview
 			if ( me.record.get('muted') || localStorage.getItem('locked') || JSON.parse(localStorage.getItem('dontDisturb')) ) me.setAudioMuted(true, true);
 
+			var js_inject = '';
 			// Injected code to detect new messages
 			if ( me.record ) {
 				var js_unread = Ext.getStore('ServicesList').getById(me.record.get('type')).get('js_unread');
@@ -355,7 +413,7 @@ Ext.define('Rambox.ux.WebView',{
 					console.groupCollapsed(me.record.get('type').toUpperCase() + ' - JS Injected to Detect New Messages');
 					console.info(me.type);
 					console.log(js_unread);
-					webview.executeJavaScript(js_unread);
+					js_inject += js_unread;
 				}
 			}
 
@@ -363,13 +421,13 @@ Ext.define('Rambox.ux.WebView',{
 			if ( Ext.getStore('ServicesList').getById(me.record.get('type')).get('titleBlink') ) {
 				var js_preventBlink = 'var originalTitle=document.title;Object.defineProperty(document,"title",{configurable:!0,set:function(a){null===a.match(new RegExp("[(]([0-9•]+)[)][ ](.*)","g"))&&a!==originalTitle||(document.getElementsByTagName("title")[0].innerHTML=a)},get:function(){return document.getElementsByTagName("title")[0].innerHTML}});';
 				console.log(js_preventBlink);
-				webview.executeJavaScript(js_preventBlink);
+				js_inject += js_preventBlink;
 			}
 
 			console.groupEnd();
 
 			// Scroll always to top (bug)
-			webview.executeJavaScript('document.body.scrollTop=0;');
+			js_inject += 'document.body.scrollTop=0;';
 
 			// Handles Certificate Errors
 			webview.getWebContents().on('certificate-error', function(event, url, error, certificate, callback) {
@@ -387,6 +445,8 @@ Ext.define('Rambox.ux.WebView',{
 				});
 				me.down('statusbar').down('button').show();
 			});
+
+			webview.executeJavaScript(js_inject);
 		});
 
 		webview.addEventListener('ipc-message', function(event) {
@@ -570,7 +630,7 @@ Ext.define('Rambox.ux.WebView',{
 	,setStatusBar: function(keep) {
 		var me = this;
 
-		me.down('statusbar').destroy();
+		me.removeDocked(me.down('statusbar'), true);
 
 		if ( keep ) {
 			me.addDocked(me.statusBarConstructor(false));
@@ -653,6 +713,14 @@ Ext.define('Rambox.ux.WebView',{
 		if ( me.record.get('enabled') ) {
 			webview.setZoomLevel(0);
 			me.record.set('zoomLevel', me.zoomLevel);
+		}
+	}
+
+	,getWebView: function() {
+		if ( this.record.get('enabled') ) {
+			return this.down('component').el.dom;
+		} else {
+			return false;
 		}
 	}
 });
